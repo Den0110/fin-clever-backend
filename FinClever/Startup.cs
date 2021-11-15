@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace FinClever
 {
+    /*
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -56,4 +57,5 @@ namespace FinClever
             });
         }
     }
+    */
 }
