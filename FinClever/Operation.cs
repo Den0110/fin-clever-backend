@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace FinClever
 {
-    public class Table1
+    public class Operation
     {
         public int Id { get; set; }
 
@@ -15,7 +15,8 @@ namespace FinClever
 
         public string category { get; set; }
 
-        public string account { get; set; }
+        public int accountId { get; set; }
 
+        public virtual Account Account { get; set; }
     }
 }

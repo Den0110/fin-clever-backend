@@ -12,6 +12,7 @@ namespace FinClever
         {   
         }
 
-        public DbSet<Table1> Table { get; set; }
+        public DbSet<Account> Accounts { get; set; }
+        public DbSet<Operation> Operations { get; set; }
     }
 }

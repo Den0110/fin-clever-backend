@@ -13,9 +13,20 @@ namespace FinClever
     {
         public static void Main(string[] args)
         {
+
             using (var context = new MyDbContext())
             {
+                var account = new Account()
+                {
+                    Name = "test_account",
+                    Type = "debit_card"
+                };
 
+                context.Accounts.Add(account);
+                context.SaveChanges();
+
+                Console.WriteLine($"id: {account.Id}, name: {account.Name}, type: {account.Type}");
+                Console.ReadLine();
             }
 
         }
