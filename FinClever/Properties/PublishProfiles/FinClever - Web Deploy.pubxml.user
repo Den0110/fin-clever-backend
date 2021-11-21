@@ -6,7 +6,17 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TimeStampOfAssociatedLegacyPublishXmlFile />
-    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA8ue+vAzsxE2TSnU4ZoU+kQAAAAACAAAAAAAQZgAAAAEAACAAAAA+sw4bPIiR95K1WEb/v3cOvNMYlNFLD4ARAYD5udQPHwAAAAAOgAAAAAIAACAAAAD6P2XM1tkRJk14c6EsaQfOZ67N4zLj79J6B+tp3oiV24AAAADgrvVbAfYJVVZ3YQWnTLcNqmAhsrlqoT2X91+aE6xqu0u17nwa9S9ZJJiR7tHdo5lZhAue9qwT6rvSUAfZF61zZo2VBjM8hAPRG7RtRepW/CRaVPyPsPJAAmgzP2b/6WRVQ8BTg5fiU5nZHdxZpveA3upV8IixNapCpAht7FqC9kAAAABVD6r701WI1MguMLcty9fTVEvP/CWwJ/nRlf2T6bz3uk96nMevE8157hJ3OleV8LKdvsB/aP18nOyUQeOgQJUt</EncryptedPassword>
-    <History>False|2021-11-17T11:19:56.1966629Z;False|2021-11-17T14:19:39.6606711+03:00;False|2021-11-17T14:18:55.1679328+03:00;False|2021-11-17T14:18:24.4501800+03:00;</History>
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAfDFoM2dmBEOpshbZD1dP5QAAAAACAAAAAAAQZgAAAAEAACAAAADNOq6t7XI1H5sxtqkbiny+s92zHJgX4H6myOvRrju2MgAAAAAOgAAAAAIAACAAAAD+s0aQmQev7a/TLKVmL0SZkYO5TOwDYFM7qHp0F4WnfoAAAAD7xR+i93rObPYB806AH7ecZTCpxq5s+1/YRhtBsbnnspGeTzXrz0B4VuC/dbKPB2s2yTmweLbte10wOYWDR1tKgSK5cPuSQqt8LwzypqubpKapnDCP8bwoXWwkf0cf9GegCv/EqPUbLYhiptpdaPrnZ3FBp39SNYhGVigANuqUTkAAAAB4ugD8lGcGlRoAkMlNl530axQNc0suHFP/Z8DNmvqhLpLoowJr2kXiMxcJqEfwD2AXMevO8/0eto4QaLUy/8Pk</EncryptedPassword>
+    <History>True|2021-11-20T22:38:08.0126823Z;True|2021-11-21T01:34:57.5014329+03:00;True|2021-11-21T00:05:30.4762533+03:00;True|2021-11-17T21:31:07.0208593+03:00;True|2021-11-17T21:28:12.5413734+03:00;True|2021-11-17T21:21:11.0640265+03:00;True|2021-11-17T21:17:41.7771438+03:00;True|2021-11-17T21:15:13.4671874+03:00;True|2021-11-17T21:14:15.8597956+03:00;True|2021-11-17T21:11:05.0097057+03:00;False|2021-11-17T21:10:42.1817347+03:00;True|2021-11-17T20:09:50.7495617+03:00;True|2021-11-17T17:39:12.2530470+03:00;True|2021-11-17T17:29:33.6831753+03:00;True|2021-11-17T17:24:10.9120881+03:00;False|2021-11-17T17:22:47.0649502+03:00;False|2021-11-17T17:22:02.5667462+03:00;False|2021-11-17T17:21:58.0567006+03:00;True|2021-11-17T17:18:04.4721112+03:00;True|2021-11-17T17:16:27.8528848+03:00;True|2021-11-17T17:05:49.1830711+03:00;False|2021-11-17T14:19:56.1966629+03:00;False|2021-11-17T14:19:39.6606711+03:00;False|2021-11-17T14:18:55.1679328+03:00;False|2021-11-17T14:18:24.4501800+03:00;</History>
   </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="MyDbContext">
+      <Value>Data Source=tcp:finclever.database.windows.net,1433%3bInitial Catalog=FinCleverDataBase%3bUser Id=finclever%40finclever%3bPassword=RDaC8WYc</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+  <ItemGroup>
+    <EFMigrations Include="FinClever.MyDbContext">
+      <Value>Data Source=tcp:finclever.database.windows.net,1433%3bInitial Catalog=FinCleverDataBase%3bUser Id=finclever%40finclever%3bPassword=RDaC8WYc</Value>
+    </EFMigrations>
+  </ItemGroup>
 </Project>

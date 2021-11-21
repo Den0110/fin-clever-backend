@@ -1,6 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <parameters>
   <parameter name="IIS Web Application Name" description="" value="FinClever" tags="IisApp">
-    <parameterEntry kind="ProviderPath" scope="IisApp" match="^C:\\Users\\salik\\OneDrive\\Рабочий\ стол\\project\\FinClever\\FinClever\\obj\\Release\\net5\.0\\PubTmp\\Out\\$" />
+    <parameterEntry kind="ProviderPath" scope="IisApp" match="^D:\\Applications\\FinClever\\FinClever\\obj\\Release\\net5\.0\\PubTmp\\Out\\$" />
+  </parameter>
+  <parameter name="FinClever.MyDbContext" description="" value="Data Source=tcp:finclever.database.windows.net,1433;Initial Catalog=FinCleverDataBase;User Id=finclever@finclever;Password=RDaC8WYc" tags="dbfullsql">
+    <parameterEntry kind="ProviderPath" scope="dbfullsql" match="^D:\\Applications\\FinClever\\FinClever\\obj\\Release\\net5\.0\\PubTmp\\EFSQLScripts\\FinClever\.MyDbContext\.sql$" />
   </parameter>
 </parameters>

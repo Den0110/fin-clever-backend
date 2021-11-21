@@ -3,9 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace FinClever
 {
@@ -13,30 +11,18 @@ namespace FinClever
     {
         public static void Main(string[] args)
         {
+            EntityFrameworkProfilerBootstrapper.PreStart();
 
-            using (var context = new MyDbContext())
-            {
-                var account = new Account()
-                {
-                    Name = "test_account",
-                    Type = "debit_card"
-                };
-
-                context.Accounts.Add(account);
-                context.SaveChanges();
-
-                Console.WriteLine($"id: {account.Id}, name: {account.Name}, type: {account.Type}");
-                Console.ReadLine();
-            }
-
+            CreateHostBuilder(args).Build().Run();
         }
 
-        /* public static IHostBuilder CreateHostBuilder(string[] args) =>
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
              Host.CreateDefaultBuilder(args)
                  .ConfigureWebHostDefaults(webBuilder =>
                  {
                      webBuilder.UseStartup<Startup>();
                  });
-     }*/
+     
     }
 }
+

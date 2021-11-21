@@ -1,20 +1,15 @@
+using FinClever.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FinClever
 {
-    /*
+    
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -27,7 +22,11 @@ namespace FinClever
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddScoped<IAccountRepository, AccountRepository>();
+            // добавл€ет контекст бд в Dependency Injection, чтобы можно было получать его экземпл€р в конструкторе других классов
+            services.AddDbContext<FinCleverDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("FinCleverDb"))
+            );
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -42,7 +41,11 @@ namespace FinClever
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "FinClever v1"));
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "FinClever v1");
+                    c.RoutePrefix = string.Empty;
+                });
             }
 
             app.UseHttpsRedirection();
@@ -57,5 +60,5 @@ namespace FinClever
             });
         }
     }
-    */
+    
 }
