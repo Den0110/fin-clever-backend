@@ -1,10 +1,10 @@
 {
   "dependencies": {
-    "mssql1": {
-      "secretStore": "AzureAppSettings",
+    "mssql2": {
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/finclever/databases/FinCleverDataBase",
       "type": "mssql.azure",
-      "connectionId": "ConnectionStrings:MyDbContext"
+      "connectionId": "ConnectionStrings:FinCleverDb",
+      "secretStore": "AzureAppSettings"
     }
   }
 }
