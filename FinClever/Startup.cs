@@ -23,6 +23,7 @@ namespace FinClever
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IAccountRepository, AccountRepository>();
+            services.AddScoped<IOperationRepository, OperationRepository>();
             // добавл€ет контекст бд в Dependency Injection, чтобы можно было получать его экземпл€р в конструкторе других классов
             services.AddDbContext<FinCleverDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("FinCleverDb"))
