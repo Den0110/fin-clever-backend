@@ -6,15 +6,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using SimplePatch;
 
 namespace FinClever
 {
-    
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            DeltaConfig.Init(cfg => {
+                cfg.AddEntity<Account>();
+            });
         }
 
         public IConfiguration Configuration { get; }
@@ -25,9 +29,10 @@ namespace FinClever
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IOperationRepository, OperationRepository>();
             // добавл€ет контекст бд в Dependency Injection, чтобы можно было получать его экземпл€р в конструкторе других классов
-            services.AddDbContext<FinCleverDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("FinCleverDb"))
-            );
+            services.AddDbContext<FinCleverDbContext>(options => {
+                options.UseLazyLoadingProxies();
+                options.UseSqlServer(Configuration.GetConnectionString("FinCleverDb"));
+            });
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -38,16 +43,15 @@ namespace FinClever
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "FinClever v1");
-                    c.RoutePrefix = string.Empty;
-                });
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "FinClever v1");
+                c.RoutePrefix = string.Empty;
+            });
+
+            app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
             app.UseHttpsRedirection();
 
@@ -61,5 +65,5 @@ namespace FinClever
             });
         }
     }
-    
+
 }

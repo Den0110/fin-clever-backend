@@ -1,10 +1,13 @@
 {
   "dependencies": {
     "mssql2": {
+      "secretStore": "LocalSecretsFile",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/finclever/databases/FinCleverDataBase",
       "type": "mssql.azure",
-      "connectionId": "ConnectionStrings:FinCleverDb",
-      "secretStore": "LocalSecretsFile"
+      "connectionId": "ConnectionStrings:FinCleverDb"
+    },
+    "secrets1": {
+      "type": "secrets.user"
     }
   }
 }
