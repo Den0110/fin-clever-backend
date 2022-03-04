@@ -3,8 +3,13 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <UserSecretsId>4256e995-71d3-45e2-8d4a-3a643c2b0bad</UserSecretsId>
+    <NullableContextOptions>enable</NullableContextOptions>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" Version="1.2.1" />
     <PackageReference Include="Azure.Identity" Version="1.5.0" />
@@ -22,6 +27,12 @@
     </PackageReference>
     <PackageReference Include="SimplePatch" Version="3.0.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.14" />
+    <PackageReference Include="NUnit.ConsoleRunner" Version="3.15.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <None Remove="NUnit.ConsoleRunner" />
+  </ItemGroup>
 </Project>

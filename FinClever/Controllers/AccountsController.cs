@@ -1,13 +1,12 @@
 ﻿using FinClever.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace FinClever.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("/api/accounts")]
     public class AccountsController : ControllerBase
@@ -35,6 +34,7 @@ namespace FinClever.Controllers
         [HttpPost]
         public async Task<ActionResult<Account>> PostAccount([FromBody] Account account)
         {
+            account.UserId = User.GetId();
             var newAccount = await repository.Create(account);
             return CreatedAtAction(nameof(GetAccounts), new { Id = newAccount.Id }, newAccount);
         }

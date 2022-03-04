@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Azure.Identity;
+using System.IO;
 
 namespace FinClever
 {
@@ -13,7 +14,6 @@ namespace FinClever
         public static void Main(string[] args)
         {
             EntityFrameworkProfilerBootstrapper.PreStart();
-
             CreateHostBuilder(args).Build().Run();
         }
 
@@ -21,6 +21,9 @@ namespace FinClever
              Host.CreateDefaultBuilder(args)
                  .ConfigureWebHostDefaults(webBuilder =>
                  {
+                     webBuilder.UseContentRoot(Directory.GetCurrentDirectory());
+                     webBuilder.UseUrls("https://localhost:5001", "https://192.168.0.248:5001");
+                     webBuilder.UseIISIntegration();
                      webBuilder.UseStartup<Startup>();
                  });
      

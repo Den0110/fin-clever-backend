@@ -1,10 +1,13 @@
 using FinClever.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SimplePatch;
 
@@ -13,10 +16,13 @@ namespace FinClever
 
     public class Startup
     {
+        static string FIREBASE_PROJECT_ID = "finclever-cec82";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            DeltaConfig.Init(cfg => {
+            DeltaConfig.Init(cfg =>
+            {
                 cfg.AddEntity<Account>();
             });
         }
@@ -28,11 +34,27 @@ namespace FinClever
         {
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<IOperationRepository, OperationRepository>();
-            // добавл€ет контекст бд в Dependency Injection, чтобы можно было получать его экземпл€р в конструкторе других классов
-            services.AddDbContext<FinCleverDbContext>(options => {
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            // ????????? ???????? ?? ? Dependency Injection, ????? ????? ???? ???????? ??? ????????? ? ???????????? ?????? ???????
+            services.AddDbContext<FinCleverDbContext>(options =>
+            {
                 options.UseLazyLoadingProxies();
                 options.UseSqlServer(Configuration.GetConnectionString("FinCleverDb"));
             });
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = $"https://securetoken.google.com/{FIREBASE_PROJECT_ID}";
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidIssuer = $"https://securetoken.google.com/{FIREBASE_PROJECT_ID}",
+                        ValidateAudience = true,
+                        ValidAudience = FIREBASE_PROJECT_ID,
+                        ValidateLifetime = true
+                    };
+                });
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -55,8 +77,8 @@ namespace FinClever
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

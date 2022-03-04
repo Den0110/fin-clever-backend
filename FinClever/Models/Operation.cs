@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
-using Azure;
+using System.Text.Json.Serialization;
 
 namespace FinClever
 {
@@ -12,13 +9,17 @@ namespace FinClever
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public float Value { get; set; }
-        public string Type { get; set; }
-        public string Category { get; set; }
+        public string? Type { get; set; }
+        public string? Category { get; set; }
         public long Date { get; set; }
-        public string Place { get; set; }
-        public string Note { get; set; }
+        public string? Place { get; set; }
+        public string? Note { get; set; }
         public int AccountId { get; set; }
-        public virtual Account Account { get; set; }
+        public virtual Account? Account { get; set; }
+
+        [JsonIgnore]
+        [ForeignKey("User")]
+        public string? UserId { get; set; }
 
         public float AbsoluteBalanceEffect()
         {
