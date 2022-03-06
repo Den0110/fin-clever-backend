@@ -1,4 +1,5 @@
 ﻿using FinClever.Controllers;
+using FinClever.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,8 @@ namespace FinClever
 
         public DbSet<Operation> Operations { get; set; }
 
+        public DbSet<InvestOperation> InvestOperations { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -27,6 +30,8 @@ namespace FinClever
                 builder.Entity<Account>()
                     .HasQueryFilter(account => account.UserId == _httpContextAccessor.HttpContext.User.GetId());
                 builder.Entity<Operation>()
+                    .HasQueryFilter(operation => operation.UserId == _httpContextAccessor.HttpContext.User.GetId());
+                builder.Entity<InvestOperation>()
                     .HasQueryFilter(operation => operation.UserId == _httpContextAccessor.HttpContext.User.GetId());
             }
         }
