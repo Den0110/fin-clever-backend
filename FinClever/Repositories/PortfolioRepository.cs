@@ -11,44 +11,36 @@ namespace FinClever.Repositories
     public class PortfolioRepository : IPortfolioRepository
     {
         private readonly FinCleverDbContext context;
-        static HttpClient httpClient = new HttpClient();
-
-        static string IexBaseUrl = "https://cloud.iexapis.com/stable";
-        static string IexToken = "pk_83915c8c73ec49268860d8dd0c446299";
 
         public PortfolioRepository(FinCleverDbContext context)
         {
             this.context = context;
         }
 
-        public async Task<IEnumerable<PortfolioStock>> GetStocks()
+        public async Task<IEnumerable<PortfolioStock>> GetStocks(long? date = null)
         {
-            var stocks = await context.InvestOperations
-                .GroupBy(o => o.Ticker)
-                .Select(g => MapOperationGroupToStock(g))
-                .ToListAsync();
-
-            var ticker = "AAPL";
-            var response = await httpClient.GetAsync($"{IexBaseUrl}/stock/{ticker}/quote?token={IexToken}");
-            if (response.IsSuccessStatusCode)
+            if(date == null)
             {
-                var quote = await response.Content.ReadAsAsync<IexQuote>();
-                stocks.ForEach(x => x.CurrentPrice = quote.close);
+                date = ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds();
             }
-            response.EnsureSuccessStatusCode();
-
-            return stocks;
+            return await context.InvestOperations
+                .Where(o => o.Date <= date)
+                .GroupBy(o => o.Ticker)
+                .Select(g => new PortfolioStock(
+                    g.Key,
+                    g.Sum(x => x.UsdPrice * x.Amount) / g.Sum(x => x.Amount),
+                    g.Sum(x => x.Price * x.Amount) / g.Sum(x => x.Amount),
+                    g.Sum(x => x.Amount)
+                ))
+                .ToListAsync();
         }
 
-        private PortfolioStock MapOperationGroupToStock(IGrouping<string, InvestOperation> g)
+        public async Task<IEnumerable<string>> GetAllTickets()
         {
-            int amount = g.Sum(x => x.Amount);
-            return new PortfolioStock(
-                g.Key,
-                g.Sum(x => x.UsdPrice * x.Amount) / amount,
-                g.Sum(x => x.Price * x.Amount) / amount,
-                amount
-            );
+            return await context.InvestOperations
+                .GroupBy(o => o.Ticker)
+                .Select(x => x.Key)
+                .ToListAsync();
         }
     }
 }

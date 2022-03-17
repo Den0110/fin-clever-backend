@@ -1,5 +1,6 @@
 ﻿using FinClever.Controllers;
 using FinClever.Models;
+using FinClever.Models.invest;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,8 @@ namespace FinClever
         public DbSet<Operation> Operations { get; set; }
 
         public DbSet<InvestOperation> InvestOperations { get; set; }
+
+        public DbSet<StockPriceCache> StockPrices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

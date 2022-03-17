@@ -13,34 +13,41 @@ namespace FinClever.Controllers
     [Route("/api/invest/operations")]
     public class InvestOperationsController : ControllerBase
     {
-        private readonly IInvestOperationRepository repository;
+        private readonly IInvestOperationRepository operationRepository;
+        private readonly ICurrencyRepository currencyRepository;
 
-        public InvestOperationsController(IInvestOperationRepository repository)
+        public InvestOperationsController(IInvestOperationRepository operationRepository, ICurrencyRepository currencyRepository)
         {
-            this.repository = repository;
+            this.operationRepository = operationRepository;
+            this.currencyRepository = currencyRepository;
         }
 
         [HttpGet]
         public async Task<IEnumerable<InvestOperation>> GetOperations(string? ticker)
         {
-            return ticker == null ? await repository.Get() : await repository.GetForTicker(ticker);
+            return ticker == null ? await operationRepository.Get() :
+                await operationRepository.GetForTicker(ticker);
         }
 
         [HttpPost]
         public async Task<ActionResult<InvestOperation>> PostOperation([FromBody] InvestOperation operation)
         {
             operation.UserId = User.GetId();
-            var newOperation = await repository.Create(operation);
+            if(operation.UsdPrice == 0.0)
+            {
+                operation.UsdPrice = await currencyRepository.GetUsdRate();
+            }
+            var newOperation = await operationRepository.Create(operation);
             return CreatedAtAction(nameof(GetOperations), new { Id = newOperation.Id }, newOperation);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteOperation(int id)
         {
-            var operation = await repository.Get(id);
+            var operation = await operationRepository.Get(id);
             if (operation == null)
                 return NotFound();
-            await repository.Delete(id);
+            await operationRepository.Delete(id);
             return NoContent();
         }
     }

@@ -4,6 +4,7 @@ namespace FinClever.Models
     public class PortfolioStock
     {
         public string Ticker { get; set; }
+        public string CompanyName { get; set; }
         public double UsdPurchasePrice { get; set; }
         public double PurchasePrice { get; set; }
         public double? CurrentPrice { get; set; }

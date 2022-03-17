@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Quartz;
 using SimplePatch;
 
 namespace FinClever
@@ -37,8 +38,10 @@ namespace FinClever
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IInvestOperationRepository, InvestOperationRepository>();
             services.AddScoped<IPortfolioRepository, PortfolioRepository>();
+            services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+            services.AddScoped<IStockRepository, StockRepository>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            // ????????? ???????? ?? ? Dependency Injection, ????? ????? ???? ???????? ??? ????????? ? ???????????? ?????? ???????
+
             services.AddDbContext<FinCleverDbContext>(options =>
             {
                 options.UseLazyLoadingProxies();
@@ -61,6 +64,19 @@ namespace FinClever
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FinClever", Version = "v1" });
+            });
+            services.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionJobFactory();
+
+                var jobKey = new JobKey("CachingStockHistoryJob");
+                q.AddJob<CachingStockHistoryJob>(opts => opts.WithIdentity(jobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(jobKey)
+                    .WithIdentity("CachingStockHistoryJob-trigger")
+                    .WithSimpleSchedule(x => x
+                        .WithIntervalInMinutes(5)
+                        .RepeatForever()));
             });
         }
 

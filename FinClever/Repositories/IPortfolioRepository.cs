@@ -7,6 +7,7 @@ namespace FinClever.Repositories
 {
     public interface IPortfolioRepository
     {
-        Task<IEnumerable<PortfolioStock>> GetStocks();
+        Task<IEnumerable<PortfolioStock>> GetStocks(long? date = null);
+        Task<IEnumerable<string>> GetAllTickets();
     }
 }
