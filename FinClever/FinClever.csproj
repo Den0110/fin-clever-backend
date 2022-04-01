@@ -32,6 +32,7 @@
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Quartz" Version="3.3.3" />
     <PackageReference Include="Quartz.Extensions.Hosting" Version="3.3.3" />
+    <PackageReference Include="netcore-ef-util" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,6 +42,8 @@
     <None Remove="Models\stock\" />
     <None Remove="Quartz" />
     <None Remove="Quartz.Extensions.Hosting" />
+    <None Remove="EFCore.BulkExtensions" />
+    <None Remove="netcore-ef-util" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\invest\" />

@@ -8,9 +8,10 @@ namespace FinClever.Repositories
 {
     public interface IStockRepository
     {
-        Task<IexQuote> GetStock(string ticker);
-        Task<IEnumerable<IexStockHistoryItem>> GetStockHistory(string ticker);
-        Task SavePriceHistoryCache(IEnumerable<StockPriceCache> prices);
-        Task<StockPriceCache> GetPriceHistoryCache(long date, string ticker);
+        Task<FinnhubQuote?> GetStock(string ticker);
+        Task<StockHistory?> GetStockHistory(string ticker);
+
+        Task<int> SavePriceHistoryCache(IList<StockPriceCache> prices);
+        Task<StockPriceCache?> GetPriceHistoryCache(long date, string ticker);
     }
 }

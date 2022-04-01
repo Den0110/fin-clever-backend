@@ -37,6 +37,23 @@ namespace FinClever.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("signup")]
+        public async Task<ActionResult<User>> SignUp([FromBody] User user)
+        {
+            var id = User.GetId();
+            var existingUser = await userRepository.Get(id);
+            if (existingUser != null)
+            {
+                return BadRequest();
+            }
+            else
+            {
+                var newUser = new User(User.GetId(), user.Name, User.GetEmail(), User.GetImage());
+                return await userRepository.Create(newUser);
+            }
+        }
+
         [HttpGet]
         public async Task<IEnumerable<User>> Users()
         {

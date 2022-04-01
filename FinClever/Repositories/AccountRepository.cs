@@ -28,7 +28,7 @@ namespace FinClever.Repositories
             await context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Account>> Get()
+        public async Task<List<Account>> Get()
         {
             return await context.Accounts.ToListAsync();
         }

@@ -65,19 +65,6 @@ namespace FinClever
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "FinClever", Version = "v1" });
             });
-            services.AddQuartz(q =>
-            {
-                q.UseMicrosoftDependencyInjectionJobFactory();
-
-                var jobKey = new JobKey("CachingStockHistoryJob");
-                q.AddJob<CachingStockHistoryJob>(opts => opts.WithIdentity(jobKey));
-                q.AddTrigger(opts => opts
-                    .ForJob(jobKey)
-                    .WithIdentity("CachingStockHistoryJob-trigger")
-                    .WithSimpleSchedule(x => x
-                        .WithIntervalInMinutes(5)
-                        .RepeatForever()));
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

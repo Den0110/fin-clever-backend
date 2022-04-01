@@ -24,20 +24,28 @@ namespace FinClever
 
         public async Task Execute(IJobExecutionContext context)
         {
+            Console.WriteLine("CachingStockHistoryJob start");
             var allTickers = await portfolioRepository.GetAllTickets();
             var prices = new List<StockPriceCache>();
 
             foreach (var t in allTickers)
             {
+                Console.WriteLine($"Ticker: {t}");
                 var history = await stockRepository.GetStockHistory(t);
-                prices.AddRange(history.Select(x =>
+                if (history?.Prices != null)
                 {
-                    var date = ParseDate(x.Date);
-                    var price = x.Close;
-                    return new StockPriceCache(date, t, price);
-                }));
+                    Console.WriteLine($"History size: {history.Prices.Count}");
+                    prices.AddRange(history.Prices.Select(p =>
+                    {
+                        var date = ParseDate(p.Key);
+                        var price = double.Parse(p.Value.Close ?? "0");
+                        return new StockPriceCache(date, t, price);
+                    }));
+                }
             }
-            await stockRepository.SavePriceHistoryCache(prices);
+            var updatedPrices = await stockRepository.SavePriceHistoryCache(prices);
+            Console.WriteLine($"Updated prices: {updatedPrices}");
+            Console.WriteLine("CachingStockHistoryJob end");
         }
 
         private long ParseDate(string date)
