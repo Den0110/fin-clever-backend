@@ -25,44 +25,71 @@ namespace FinClever.Controllers
         }
 
         [HttpGet]
-        public async Task<Portfolio> GetStocks()
+        public async Task<Portfolio> GetStocks(string? range = null, bool? showHistoricalProfit = null)
         {
             var totalPrice = .0;
-            var stocks = await portfolioRepository.GetStocks();
+            var stocks = await portfolioRepository.GetStocks(User.GetId());
 
             foreach (var s in stocks)
             {
                 var ticker = s.Ticker;
                 var stockInfo = await stockRepository.GetStock(ticker);
-                s.CurrentPrice = stockInfo.LatestPrice;
-                s.CompanyName = stockInfo.CompanyName;
-                totalPrice += s.CurrentPrice * s.Amount ?? .0;
-            }
-
-            var priceHistory = new List<PriceItem>();
-
-            foreach (var day in GetDaysFor6m())
-            {
-                var dayStocks = await portfolioRepository.GetStocks(day);
-                var portfolioPrice = .0;
-                foreach (var stock in dayStocks)
-                {
-                    var item = await stockRepository.GetPriceHistoryCache(day, stock.Ticker);
-                    portfolioPrice += item.Price * stock.Amount;
+                if(stockInfo != null) {
+                    s.CurrentPrice = stockInfo.CurrentPrice;
+                    s.CompanyName = ticker;
+                    totalPrice += s.CurrentPrice * s.Amount ?? .0;
                 }
-                priceHistory.Add(new PriceItem(day, portfolioPrice));
             }
+
+            var priceHistory = await portfolioRepository.GetPortfolioHistory(User.GetId(), GetDaysForRange(range ?? "M"), showHistoricalProfit ?? false);
+
+            priceHistory.Last().Price = totalPrice;
 
             return new Portfolio(totalPrice, priceHistory, stocks);
         }
 
-        private static IEnumerable<long> GetDaysFor6m()
+        private static long GetTime()
         {
-            var startDay = ((DateTimeOffset) DateTime.Now.Date.AddMonths(-6)).ToUnixTimeSeconds();
-            var endDay = ((DateTimeOffset)DateTime.Now.Date).ToUnixTimeSeconds();
-            var step = 24 * 60 * 60;
-            for (long i = startDay; i <= endDay; i += step)
+            return ((DateTimeOffset)DateTime.Now).ToUnixTimeMilliseconds();
+        }
+
+        private static IEnumerable<long> GetDaysForRange(string range)
+        {
+            var endDate = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
+            var startDate = endDate.AddMonths(-1);
+            var dayStep = 1;
+            switch (range)
+            {
+                case "W":
+                    startDate = endDate.AddDays(-7);
+                    dayStep = 1;
+                    break;
+                case "M":
+                    startDate = endDate.AddMonths(-1);
+                    dayStep = 1;
+                    break;
+                case "6M":
+                    startDate = endDate.AddMonths(-6);
+                    dayStep = 7;
+                    break;
+                case "1Y":
+                    startDate = endDate.AddYears(-1);
+                    dayStep = 7;
+                    break;
+                case "ALL":
+                    startDate = endDate.AddYears(-20);
+                    dayStep = 6 * 30;
+                    break;
+            }
+            
+            var startDay = ((DateTimeOffset)startDate).ToUnixTimeSeconds();
+            var endDay = ((DateTimeOffset)endDate).ToUnixTimeSeconds();
+            var step = dayStep * 24 * 60 * 60;
+            long i;
+            for (i = startDay; i <= endDay; i += step)
                 yield return i;
+            if (i != endDay + step)
+                yield return endDay;
         }
 
     }

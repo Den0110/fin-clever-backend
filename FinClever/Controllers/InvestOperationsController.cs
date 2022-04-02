@@ -25,8 +25,8 @@ namespace FinClever.Controllers
         [HttpGet]
         public async Task<IEnumerable<InvestOperation>> GetOperations(string? ticker)
         {
-            return ticker == null ? await operationRepository.Get() :
-                await operationRepository.GetForTicker(ticker);
+            return ticker == null ? await operationRepository.Get(User.GetId()) :
+                await operationRepository.GetForTicker(User.GetId(), ticker);
         }
 
         [HttpPost]
@@ -44,10 +44,10 @@ namespace FinClever.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteOperation(int id)
         {
-            var operation = await operationRepository.Get(id);
+            var operation = await operationRepository.Get(User.GetId(), id);
             if (operation == null)
                 return NotFound();
-            await operationRepository.Delete(id);
+            await operationRepository.Delete(User.GetId(), id);
             return NoContent();
         }
     }

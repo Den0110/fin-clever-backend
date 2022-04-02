@@ -23,32 +23,37 @@ namespace FinClever.Repositories
             return operation;
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(string userId, int id)
         {
-            var operation = await context.InvestOperations.FindAsync(id);
+            var operation = await context.InvestOperations.FirstAsync(x => x.UserId == userId && x.Id == id);
             context.InvestOperations.Remove(operation);
             await context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<InvestOperation>> Get()
+        public async Task<IEnumerable<InvestOperation>> Get(string userId)
         {
-            return await context.InvestOperations.ToListAsync();
+            return await context.InvestOperations.Where(x => x.UserId == userId).ToListAsync();
         }
 
-        public async Task<InvestOperation> Get(int id)
+        public async Task<InvestOperation> Get(string userId, int id)
         {
-            return await context.InvestOperations.FindAsync(id);
+            return await context.InvestOperations.FirstAsync(x => x.UserId == userId && x.Id == id);
         }
 
-        public async Task<IEnumerable<InvestOperation>> GetForTicker(string ticker)
+        public async Task<IEnumerable<InvestOperation>> GetForTicker(string userId, string ticker)
         {
-            return await context.InvestOperations.Where(x => x.Ticker == ticker).ToListAsync();
+            return await context.InvestOperations.Where(x => x.UserId == userId && x.Ticker == ticker).ToListAsync();
         }
 
         public async Task Update(InvestOperation operation)
         {
             context.Entry(operation).State = EntityState.Modified;
             await context.SaveChangesAsync();
+        }
+
+        public async Task<bool> HasOne(string userId)
+        {
+            return await context.InvestOperations.Where(x => x.UserId == userId).CountAsync() > 0;
         }
     }
 }
