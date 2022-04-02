@@ -2,7 +2,8 @@
 # Данный GITIGNORE-файл был автоматически создан Microsoft(R) Visual Studio.
 ################################################################################
 
-/.vs
+.vs
 /FinClever/bin
 /FinClever/obj
 /FinClever/FinClever.csproj.user
+.suo
