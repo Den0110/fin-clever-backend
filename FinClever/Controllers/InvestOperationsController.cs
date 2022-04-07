@@ -14,11 +14,17 @@ namespace FinClever.Controllers
     public class InvestOperationsController : ControllerBase
     {
         private readonly IInvestOperationRepository operationRepository;
+        private readonly IStockRepository stockRepository;
         private readonly ICurrencyRepository currencyRepository;
 
-        public InvestOperationsController(IInvestOperationRepository operationRepository, ICurrencyRepository currencyRepository)
+        public InvestOperationsController(
+            IInvestOperationRepository operationRepository,
+            IStockRepository stockRepository,
+            ICurrencyRepository currencyRepository
+        )
         {
             this.operationRepository = operationRepository;
+            this.stockRepository = stockRepository;
             this.currencyRepository = currencyRepository;
         }
 
@@ -33,7 +39,12 @@ namespace FinClever.Controllers
         public async Task<ActionResult<InvestOperation>> PostOperation([FromBody] InvestOperation operation)
         {
             operation.UserId = User.GetId();
-            if(operation.UsdPrice == 0.0)
+            var price = await stockRepository.GetStock(operation.Ticker);
+            if (price?.CurrentPrice == 0)
+            {
+                return BadRequest();
+            }
+            if (operation.UsdPrice == 0.0)
             {
                 operation.UsdPrice = await currencyRepository.GetUsdRate();
             }

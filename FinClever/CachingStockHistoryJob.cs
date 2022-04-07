@@ -28,8 +28,15 @@ namespace FinClever
             var allTickers = await portfolioRepository.GetAllTickets();
             var prices = new List<StockPriceCache>();
 
+            var counter = 0;
             foreach (var t in allTickers)
             {
+                // pause for 2 min every 5 requests not to break the API limit
+                if (counter >= 5)
+                {
+                    Thread.Sleep(120000);
+                    counter = 0;
+                }
                 Console.WriteLine($"Ticker: {t}");
                 var history = await stockRepository.GetStockHistory(t);
                 if (history?.Prices != null)
@@ -42,6 +49,7 @@ namespace FinClever
                         return new StockPriceCache(date, t, price);
                     }));
                 }
+                counter++;
             }
             var updatedPrices = await stockRepository.SavePriceHistoryCache(prices);
             Console.WriteLine($"Updated prices: {updatedPrices}");

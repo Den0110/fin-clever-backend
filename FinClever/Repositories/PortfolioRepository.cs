@@ -62,6 +62,9 @@ namespace FinClever.Repositories
             {
                 showHistoricalProfitValue = 1;
             }
+            Console.WriteLine($"@userId={userId}");
+            Console.WriteLine($"@datesStr={datesStr}");
+            Console.WriteLine($"@showHistoricalProfit={showHistoricalProfitValue}");
             var prices = await RawSqlQuery("exec portfolioHistory @userId,@dates,@showHistoricalProfit", x =>
             {
                 long date;
@@ -87,6 +90,7 @@ namespace FinClever.Repositories
                     command.Parameters.Add(param);
                 }
                 command.CommandType = CommandType.Text;
+                command.CommandTimeout = 120;
 
                 context.Database.OpenConnection();
 
