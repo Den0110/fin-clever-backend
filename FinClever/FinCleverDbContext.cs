@@ -23,7 +23,9 @@ namespace FinClever
 
         public DbSet<InvestOperation> InvestOperations { get; set; }
 
-        public DbSet<StockPriceCache> StockPrices { get; set; }
+        public DbSet<HistoryStockPriceCache> HistoryStockPrices { get; set; }
+
+        public DbSet<CurrentStockPriceCache> CurrentStockPrices { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

@@ -31,13 +31,22 @@ namespace FinClever
                     {
                         q.UseMicrosoftDependencyInjectionJobFactory();
 
-                        var jobKey = new JobKey("CachingStockHistoryJob");
-                        q.AddJob<CachingStockHistoryJob>(opts => opts.WithIdentity(jobKey));
+                        var historyJobKey = new JobKey("CachingStockHistoryJob");
+                        q.AddJob<CachingStockHistoryJob>(opts => opts.WithIdentity(historyJobKey));
                         q.AddTrigger(opts => opts
-                            .ForJob(jobKey)
+                            .ForJob(historyJobKey)
                             .WithIdentity("CachingStockHistoryJob-trigger")
                             .WithSimpleSchedule(x => x
                                 .WithIntervalInHours(24)
+                                .RepeatForever()));
+
+                        var pricesJobKey = new JobKey("CachingStockPricesJob");
+                        q.AddJob<CachingStockPricesJob>(opts => opts.WithIdentity(pricesJobKey));
+                        q.AddTrigger(opts => opts
+                            .ForJob(pricesJobKey)
+                            .WithIdentity("CachingStockPricesJob-trigger")
+                            .WithSimpleSchedule(x => x
+                                .WithIntervalInMinutes(3)
                                 .RepeatForever()));
                     });
 

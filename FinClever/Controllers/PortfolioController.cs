@@ -29,14 +29,14 @@ namespace FinClever.Controllers
         {
             var totalPrice = .0;
             var stocks = await portfolioRepository.GetStocks(User.GetId());
+            var prices = (await stockRepository.GetCurrentPriceCache())
+                .ToDictionary(x => x.Ticker, x => x.Price);
 
             foreach (var s in stocks)
             {
-                var ticker = s.Ticker;
-                var stockInfo = await stockRepository.GetStock(ticker);
-                if(stockInfo != null) {
-                    s.CurrentPrice = stockInfo.CurrentPrice;
-                    s.CompanyName = ticker;
+                if(prices.ContainsKey(s.Ticker)) {
+                    s.CurrentPrice = prices[s.Ticker];
+                    s.CompanyName = s.Ticker;
                     totalPrice += s.CurrentPrice * s.Amount ?? .0;
                 }
             }

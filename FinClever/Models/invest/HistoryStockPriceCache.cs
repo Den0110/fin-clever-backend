@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FinClever.Models.invest
 {
-    public class StockPriceCache
+    public class HistoryStockPriceCache
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
@@ -13,7 +13,7 @@ namespace FinClever.Models.invest
         public string Ticker { get; set; }
         public double Price { get; set; }
 
-        public StockPriceCache(long date, string ticker, double price)
+        public HistoryStockPriceCache(long date, string ticker, double price)
         {
             Date = date;
             Ticker = ticker;

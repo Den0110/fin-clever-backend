@@ -47,23 +47,42 @@ namespace FinClever.Repositories
             return null;
         }
 
-        public async Task<int> SavePriceHistoryCache(IList<StockPriceCache> prices)
+        public async Task<int> SavePriceHistoryCache(IList<HistoryStockPriceCache> prices)
         {
             foreach(var t in prices.Select(x => x.Ticker).Distinct())
             {
-                context.StockPrices.RemoveRange(context.StockPrices.Where(x => x.Ticker == t));
+                context.HistoryStockPrices.RemoveRange(
+                    context.HistoryStockPrices.Where(x => x.Ticker == t)
+                );
             }
 
-            context.StockPrices.AddRange(prices);
+            context.HistoryStockPrices.AddRange(prices);
 
             return await context.SaveChangesAsync();
         }
 
-        public async Task<StockPriceCache?> GetPriceHistoryCache(long date, string ticker)
+        public async Task<HistoryStockPriceCache?> GetPriceHistoryCache(long date, string ticker)
         {
-            return await context.StockPrices
+            return await context.HistoryStockPrices
                 .Where(x => x.Date == date && x.Ticker == ticker)
                 .FirstOrDefaultAsync();
+        }
+
+        public async Task UpdateCurrentPriceCache(CurrentStockPriceCache price)
+        {
+            if(context.CurrentStockPrices.Any(x => x.Ticker == price.Ticker))
+            {
+                context.CurrentStockPrices.Update(price);
+            } else
+            {
+                context.CurrentStockPrices.Add(price);
+            }
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<List<CurrentStockPriceCache>> GetCurrentPriceCache()
+        {
+            return await context.CurrentStockPrices.ToListAsync();
         }
     }
 }

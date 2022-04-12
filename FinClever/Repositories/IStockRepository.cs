@@ -11,7 +11,10 @@ namespace FinClever.Repositories
         Task<FinnhubQuote?> GetStock(string ticker);
         Task<StockHistory?> GetStockHistory(string ticker);
 
-        Task<int> SavePriceHistoryCache(IList<StockPriceCache> prices);
-        Task<StockPriceCache?> GetPriceHistoryCache(long date, string ticker);
+        Task<int> SavePriceHistoryCache(IList<HistoryStockPriceCache> prices);
+        Task<HistoryStockPriceCache?> GetPriceHistoryCache(long date, string ticker);
+
+        Task UpdateCurrentPriceCache(CurrentStockPriceCache price);
+        Task<List<CurrentStockPriceCache>> GetCurrentPriceCache();
     }
 }

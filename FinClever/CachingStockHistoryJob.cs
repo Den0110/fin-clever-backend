@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using FinClever.Models.invest;
 using FinClever.Repositories;
-using Microsoft.Extensions.Hosting;
 using Quartz;
 
 namespace FinClever
@@ -24,9 +23,9 @@ namespace FinClever
 
         public async Task Execute(IJobExecutionContext context)
         {
-            Console.WriteLine("CachingStockHistoryJob start");
+            Console.WriteLine("History caching start");
             var allTickers = await portfolioRepository.GetAllTickets();
-            var prices = new List<StockPriceCache>();
+            var prices = new List<HistoryStockPriceCache>();
 
             var counter = 0;
             foreach (var t in allTickers)
@@ -46,14 +45,14 @@ namespace FinClever
                     {
                         var date = ParseDate(p.Key);
                         var price = double.Parse(p.Value.Close ?? "0");
-                        return new StockPriceCache(date, t, price);
+                        return new HistoryStockPriceCache(date, t, price);
                     }));
                 }
                 counter++;
             }
             var updatedPrices = await stockRepository.SavePriceHistoryCache(prices);
             Console.WriteLine($"Updated prices: {updatedPrices}");
-            Console.WriteLine("CachingStockHistoryJob end");
+            Console.WriteLine("History caching end");
         }
 
         private long ParseDate(string date)
