@@ -27,6 +27,8 @@ namespace FinClever
 
         public DbSet<CurrentStockPriceCache> CurrentStockPrices { get; set; }
 
+        public DbSet<PortfolioHistoryCache> PortfolioHistoryCache { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

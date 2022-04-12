@@ -65,19 +65,44 @@ namespace FinClever.Repositories
             Console.WriteLine($"@userId={userId}");
             Console.WriteLine($"@datesStr={datesStr}");
             Console.WriteLine($"@showHistoricalProfit={showHistoricalProfitValue}");
-            var prices = await RawSqlQuery("exec portfolioHistory @userId,@dates,@showHistoricalProfit", x =>
+            return await context.PortfolioHistoryCache
+                .Where(x => dates.Contains(x.Date) &&
+                    x.UserId == userId &&
+                    x.ShowHistoricalProfit == showHistoricalProfitValue
+                )
+                .Select(x => new PriceItem(x.Date, x.Price))
+                .ToListAsync();
+        }
+
+        public async Task UpdatePortfoliosCache(IEnumerable<long> dates, string range)
+        {
+            var datesStr = string.Join(',', dates);
+            await RawSqlQuery(
+                "exec portfolioHistoryCaching @dates,@range",
+                new SqlParameter("@dates", datesStr),
+                new SqlParameter("@range", range)
+            );
+        }
+
+        private async Task RawSqlQuery(string query, params SqlParameter[] parameters)
+        {
+            using (var command = context.Database.GetDbConnection().CreateCommand())
             {
-                long date;
-                double price;
-                if(long.TryParse(x[0].ToString(), out date) && double.TryParse(x[1].ToString() ?? "0", out price))
+                command.CommandText = query;
+                foreach (var param in parameters)
                 {
-                    return new PriceItem(date, price);
+                    command.Parameters.Add(param);
                 }
-                return null;
-            }, new SqlParameter("@userId", userId),
-            new SqlParameter("@dates", datesStr),
-            new SqlParameter("@showHistoricalProfit", showHistoricalProfitValue));
-            return prices.Where(x => x != null) as IEnumerable<PriceItem>;
+                command.CommandType = CommandType.Text;
+                command.CommandTimeout = 120;
+
+                context.Database.OpenConnection();
+
+                using (var result = command.ExecuteReader())
+                {
+                    await result.ReadAsync();
+                }
+            }
         }
 
         private async Task<List<T>> RawSqlQuery<T>(string query, Func<DbDataReader, T> map, params SqlParameter[] parameters)

@@ -70,13 +70,17 @@ namespace FinClever.Repositories
 
         public async Task UpdateCurrentPriceCache(CurrentStockPriceCache price)
         {
-            if(context.CurrentStockPrices.Any(x => x.Ticker == price.Ticker))
+            var ticker = price.Ticker;
+            if (context.CurrentStockPrices.Any(e => e.Ticker == ticker))
             {
-                context.CurrentStockPrices.Update(price);
-            } else
+                context.CurrentStockPrices.Attach(price);
+                context.Entry(price).State = EntityState.Modified;
+            }
+            else
             {
                 context.CurrentStockPrices.Add(price);
             }
+
             await context.SaveChangesAsync();
         }
 

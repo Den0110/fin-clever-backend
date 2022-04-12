@@ -11,5 +11,6 @@ namespace FinClever.Repositories
         Task<IEnumerable<string>> GetAllTickets();
         Task<IEnumerable<PortfolioStock>> GetStocks(string userId, long? date = null);
         Task<IEnumerable<PriceItem>> GetPortfolioHistory(string userId, IEnumerable<long> dates, bool showHistoricalProfit = false);
+        Task UpdatePortfoliosCache(IEnumerable<long> dates, string range);
     }
 }

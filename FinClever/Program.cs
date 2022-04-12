@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Hosting;
 using Quartz;
@@ -47,6 +47,15 @@ namespace FinClever
                             .WithIdentity("CachingStockPricesJob-trigger")
                             .WithSimpleSchedule(x => x
                                 .WithIntervalInMinutes(3)
+                                .RepeatForever()));
+
+                        var portfolioJobKey = new JobKey("CachingPortfolioHistoryJob");
+                        q.AddJob<CachingPortfolioHistoryJob>(opts => opts.WithIdentity(portfolioJobKey));
+                        q.AddTrigger(opts => opts
+                            .ForJob(portfolioJobKey)
+                            .WithIdentity("CachingPortfolioHistoryJob-trigger")
+                            .WithSimpleSchedule(x => x
+                                .WithIntervalInMinutes(5)
                                 .RepeatForever()));
                     });
 
