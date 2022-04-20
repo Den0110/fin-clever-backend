@@ -25,7 +25,6 @@ namespace FinClever
         {
             Console.WriteLine("History caching start");
             var allTickers = await portfolioRepository.GetAllTickets();
-            var prices = new List<HistoryStockPriceCache>();
 
             var counter = 0;
             foreach (var t in allTickers)
@@ -41,23 +40,18 @@ namespace FinClever
                 if (history?.Prices != null)
                 {
                     Console.WriteLine($"History size: {history.Prices.Count}");
-                    prices.AddRange(history.Prices.Select(p =>
+                    var prices = history.Prices.Select(p =>
                     {
-                        var date = ParseDate(p.Key);
+                        var date = TimeUtils.ParseDate(p.Key);
                         var price = double.Parse(p.Value.Close ?? "0");
                         return new HistoryStockPriceCache(date, t, price);
-                    }));
+                    }).ToList();
+                    var updatedPrices = await stockRepository.SavePriceHistoryCache(prices);
+                    Console.WriteLine($"Updated prices: {updatedPrices}");
                 }
                 counter++;
             }
-            var updatedPrices = await stockRepository.SavePriceHistoryCache(prices);
-            Console.WriteLine($"Updated prices: {updatedPrices}");
             Console.WriteLine("History caching end");
-        }
-
-        private long ParseDate(string date)
-        {
-            return ((DateTimeOffset)DateTime.Parse(date)).ToUnixTimeSeconds();
         }
     }
 }

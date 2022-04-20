@@ -20,7 +20,7 @@ namespace FinClever
                  .ConfigureWebHostDefaults(webBuilder =>
                  {
                      webBuilder.UseContentRoot(Directory.GetCurrentDirectory());
-                     webBuilder.UseUrls("https://localhost:5001", "https://192.168.0.247:5001");
+                     webBuilder.UseUrls("https://localhost:5001", "https://192.168.0.248:5001");
                      webBuilder.UseIISIntegration();
                      webBuilder.UseShutdownTimeout(TimeSpan.FromSeconds(60));
                      webBuilder.UseStartup<Startup>();

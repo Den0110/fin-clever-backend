@@ -44,8 +44,14 @@
     <None Remove="Quartz.Extensions.Hosting" />
     <None Remove="EFCore.BulkExtensions" />
     <None Remove="netcore-ef-util" />
+    <None Remove="ScheduledJobs\" />
+    <None Remove="Utils\" />
+    <None Remove="UseCases\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\invest\" />
+    <Folder Include="ScheduledJobs\" />
+    <Folder Include="Utils\" />
+    <Folder Include="UseCases\" />
   </ItemGroup>
 </Project>

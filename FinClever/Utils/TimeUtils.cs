@@ -27,18 +27,15 @@ namespace FinClever
                     dayStep = 1;
                     break;
                 case "6M":
-                    endDate = GetLastFriday();
-                    startDate = endDate.AddMonths(-6);
+                    startDate = GetLastFriday(endDate.AddMonths(-6));
                     dayStep = 7;
                     break;
                 case "1Y":
-                    endDate = GetLastFriday();
-                    startDate = endDate.AddYears(-1);
+                    startDate = GetLastFriday(endDate.AddYears(-1));
                     dayStep = 7;
                     break;
                 case "ALL":
-                    endDate = GetLastYearHalf();
-                    startDate = endDate.AddYears(-20);
+                    startDate = GetLastYearHalf(endDate.AddYears(-10));
                     dayStep = 6 * 30;
                     break;
             }
@@ -53,22 +50,31 @@ namespace FinClever
                 yield return endDay;
         }
 
-        private static DateTime GetLastFriday()
+        private static DateTime GetLastFriday(DateTime? startDate = null)
         {
-            DateTime lastFriday = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
+            var initDate = startDate ?? DateTime.Now;
+            DateTime lastFriday = initDate.Date.AddDays(1).AddSeconds(-1);
             while (lastFriday.DayOfWeek != DayOfWeek.Friday)
                 lastFriday = lastFriday.AddDays(-1);
             return lastFriday;
         }
 
-        private static DateTime GetLastYearHalf()
+        private static DateTime GetLastYearHalf(DateTime? startDate = null)
         {
-            DateTime lastYearHalf = DateTime.Now.Date.AddDays(1).AddSeconds(-1);
+            var initDate = startDate ?? DateTime.Now;
+            DateTime lastYearHalf = initDate.Date.AddDays(1).AddSeconds(-1);
             while (lastYearHalf.Month != 1 && lastYearHalf.Month != 7)
                 lastYearHalf = lastYearHalf.AddMonths(-1);
             while (lastYearHalf.Day != 1)
                 lastYearHalf = lastYearHalf.AddDays(-1);
+            while (lastYearHalf.DayOfWeek != DayOfWeek.Friday)
+                lastYearHalf = lastYearHalf.AddDays(-1);
             return lastYearHalf;
+        }
+
+        public static long ParseDate(string date)
+        {
+            return ((DateTimeOffset)DateTime.Parse(date)).ToUnixTimeSeconds();
         }
     }
 }

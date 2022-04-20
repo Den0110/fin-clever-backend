@@ -34,11 +34,17 @@ namespace FinClever.Controllers
 
             foreach (var s in stocks)
             {
-                if(prices.ContainsKey(s.Ticker)) {
+                if (prices.ContainsKey(s.Ticker))
+                {
                     s.CurrentPrice = prices[s.Ticker];
-                    s.CompanyName = s.Ticker;
-                    totalPrice += s.CurrentPrice * s.Amount ?? .0;
                 }
+                else
+                {
+                    var stock = await stockRepository.GetStock(s.Ticker);
+                    s.CurrentPrice = stock?.CurrentPrice ?? .0;
+                }
+                s.CompanyName = s.Ticker;
+                totalPrice += s.CurrentPrice * s.Amount ?? .0;
             }
 
             var priceHistory = await portfolioRepository.GetPortfolioHistory(

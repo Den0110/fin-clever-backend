@@ -29,9 +29,22 @@ namespace FinClever.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<string>> GetNewTickets()
+        {
+            var savedTickers = await context.HistoryStockPrices
+                .GroupBy(o => o.Ticker)
+                .Select(x => x.Key)
+                .ToListAsync();
+            return await context.InvestOperations
+                .GroupBy(o => o.Ticker)
+                .Select(x => x.Key)
+                .Where(t => !savedTickers.Contains(t))
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<PortfolioStock>> GetStocks(string userId, long? date = null)
         {
-            if(date == null)
+            if (date == null)
             {
                 date = ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds();
             }
@@ -65,13 +78,21 @@ namespace FinClever.Repositories
             Console.WriteLine($"@userId={userId}");
             Console.WriteLine($"@datesStr={datesStr}");
             Console.WriteLine($"@showHistoricalProfit={showHistoricalProfitValue}");
-            return await context.PortfolioHistoryCache
+            var history = await context.PortfolioHistoryCache
                 .Where(x => dates.Contains(x.Date) &&
                     x.UserId == userId &&
                     x.ShowHistoricalProfit == showHistoricalProfitValue
                 )
                 .Select(x => new PriceItem(x.Date, x.Price))
                 .ToListAsync();
+
+            var orderedHistory = history.OrderBy(x => x.Date).DistinctBy(x => x.Date);
+            var firstNotNull = orderedHistory.First();
+
+            var nullHistory = dates.Where(x => x < firstNotNull.Date)
+                .Select(x => new PriceItem(x, 0));
+
+            return nullHistory.Concat(orderedHistory);
         }
 
         public async Task UpdatePortfoliosCache(IEnumerable<long> dates, string range)
@@ -94,7 +115,7 @@ namespace FinClever.Repositories
                     command.Parameters.Add(param);
                 }
                 command.CommandType = CommandType.Text;
-                command.CommandTimeout = 120;
+                command.CommandTimeout = 300;
 
                 context.Database.OpenConnection();
 
