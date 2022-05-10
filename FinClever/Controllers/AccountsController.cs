@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace FinClever.Controllers
@@ -16,32 +17,35 @@ namespace FinClever.Controllers
         private readonly IInvestOperationRepository investOperationRepository;
         private readonly IPortfolioRepository portfolioRepository;
         private readonly IStockRepository stockRepository;
+        private readonly ICurrencyRepository currencyRepository;
 
         public AccountsController(
             IAccountRepository accountRepository,
             IInvestOperationRepository investOperationRepository,
             IPortfolioRepository portfolioRepository,
-            IStockRepository stockRepository
+            IStockRepository stockRepository,
+            ICurrencyRepository currencyRepository
         )
         {
             this.accountRepository = accountRepository;
             this.investOperationRepository = investOperationRepository;
             this.portfolioRepository = portfolioRepository;
             this.stockRepository = stockRepository;
+            this.currencyRepository = currencyRepository;
         }
 
         [HttpGet]
         public async Task<IEnumerable<Account>> GetAccounts()
         {
             var accounts = await accountRepository.Get();
-            //if(await investOperationRepository.HasOne())
-            //{
-            //    var brokerAcc = new Account();
-            //    brokerAcc.Name = "Брокерский счет";
-            //    brokerAcc.Type = "brokerageAccount";
-            //    brokerAcc.Balance = await GetBrokerAccountBalance();
-            //    accounts.Add(brokerAcc);
-            //}
+            if(await investOperationRepository.HasOne(User.GetId()))
+            {
+                var brokerAcc = new Account();
+                brokerAcc.Name = "Брокерский счет";
+                brokerAcc.Type = "brokerage-account";
+                brokerAcc.Balance = await GetBrokerAccountBalance();
+                accounts.Add(brokerAcc);
+            }
             return accounts;
         }
 
@@ -61,7 +65,8 @@ namespace FinClever.Controllers
                     totalPrice += s.CurrentPrice * s.Amount ?? .0;
                 }
             }
-            return (float) totalPrice;
+            var usrRate = await currencyRepository.GetUsdRate();
+            return (float) (usrRate * totalPrice);
         }
 
         [HttpGet("{id}")]

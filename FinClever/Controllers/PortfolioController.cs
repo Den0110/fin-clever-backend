@@ -58,5 +58,11 @@ namespace FinClever.Controllers
             return new Portfolio(totalPrice, priceHistory, stocks);
         }
 
+        [HttpPost]
+        [Route("potentialProfit")]
+        public async Task<double> GetPotentialProfit([FromBody] PotentialProfitRequest request)
+        {
+            return request.Sum;
+        }
     }
 }

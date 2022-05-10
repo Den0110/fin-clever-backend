@@ -32,7 +32,7 @@ namespace FinClever.Controllers
             }
             else
             {
-                var user = new User(User.GetId(), User.GetName(), User.GetEmail(), User.GetImage());
+                var user = new User(User.GetId(), User.GetName(), User.GetEmail(), User.GetImage(), "", 0);
                 return await userRepository.Create(user);
             }
         }
@@ -49,7 +49,7 @@ namespace FinClever.Controllers
             }
             else
             {
-                var newUser = new User(User.GetId(), user.Name, User.GetEmail(), User.GetImage());
+                var newUser = new User(User.GetId(), user.Name, User.GetEmail(), User.GetImage(), "", 0);
                 return await userRepository.Create(newUser);
             }
         }
@@ -65,6 +65,14 @@ namespace FinClever.Controllers
         public async Task<ActionResult<User>> Me()
         {
             return await userRepository.Get(User.GetId());
+        }
+
+        [HttpPut]
+        [Route("me")]
+        public async Task<ActionResult> EditUser([FromBody] User user)
+        {
+            await userRepository.Update(user);
+            return NoContent();
         }
     }
 }

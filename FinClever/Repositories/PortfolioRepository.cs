@@ -29,6 +29,15 @@ namespace FinClever.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<string>> GetAllNotUpdatedTickets()
+        {
+            return await context.InvestOperations
+                .GroupBy(o => o.Ticker)
+                .Select(x => x.Key)
+                .Where(x => context.HistoryStockPrices.OrderByDescending(x => x.Date).Last().Date - TimeUtils.GetTime() > 86400)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<string>> GetNewTickets()
         {
             var savedTickers = await context.HistoryStockPrices
@@ -87,7 +96,8 @@ namespace FinClever.Repositories
                 .ToListAsync();
 
             var orderedHistory = history.OrderBy(x => x.Date).DistinctBy(x => x.Date);
-            var firstNotNull = orderedHistory.First();
+            var firstNotNull = orderedHistory.FirstOrDefault() ??
+                new PriceItem(((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds(), 0);
 
             var nullHistory = dates.Where(x => x < firstNotNull.Date)
                 .Select(x => new PriceItem(x, 0));

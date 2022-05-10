@@ -42,7 +42,13 @@ namespace FinClever.Controllers
             var account = await accountRepository.Get(operation.AccountId);
             if (account == null)
                 return NotFound();
-            account.Balance += operation.AbsoluteBalanceEffect();
+            if(account.Type == "credit")
+            {
+                account.Balance -= operation.AbsoluteBalanceEffect();
+            } else
+            {
+                account.Balance += operation.AbsoluteBalanceEffect();
+            }
             await accountRepository.Update(account);
 
             return CreatedAtAction(nameof(GetOperations), new { Id = newOperation.Id }, newOperation);

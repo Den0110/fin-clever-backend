@@ -24,7 +24,7 @@ namespace FinClever
         public async Task Execute(IJobExecutionContext context)
         {
             Console.WriteLine("History caching start");
-            var allTickers = await portfolioRepository.GetAllTickets();
+            var allTickers = await portfolioRepository.GetAllNotUpdatedTickets();
 
             var counter = 0;
             foreach (var t in allTickers)
