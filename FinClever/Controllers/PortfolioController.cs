@@ -17,11 +17,13 @@ namespace FinClever.Controllers
     {
         private readonly IPortfolioRepository portfolioRepository;
         private readonly IStockRepository stockRepository;
+        private readonly SpyPricesCache spyPricesCache;
 
-        public PortfolioController(IPortfolioRepository portfolioRepository, IStockRepository stockRepository)
+        public PortfolioController(IPortfolioRepository portfolioRepository, IStockRepository stockRepository, SpyPricesCache spyPricesCache)
         {
             this.portfolioRepository = portfolioRepository;
             this.stockRepository = stockRepository;
+            this.spyPricesCache = spyPricesCache;
         }
 
         [HttpGet]
@@ -60,9 +62,53 @@ namespace FinClever.Controllers
 
         [HttpPost]
         [Route("potentialProfit")]
-        public async Task<double> GetPotentialProfit([FromBody] PotentialProfitRequest request)
+        public async Task<ActionResult<double>> GetPotentialProfit([FromBody] PotentialProfitRequest request)
         {
-            return request.Sum;
+            var minDelta = long.MaxValue;
+            var dateForPortfolio = 0L;
+            TimeUtils.GetDaysForRange("ALL").ToList().ForEach(x => {
+                var delta = Math.Abs(x - request.Date);
+                if (delta < minDelta)
+                {
+                    dateForPortfolio = x;
+                    minDelta = delta;
+                }
+            });
+
+            var startAndEnd = await portfolioRepository.GetPortfolioHistory(
+                User.GetId(),
+                new[] { dateForPortfolio, ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds() },
+                true
+            );
+            if (startAndEnd.Count() < 2 || startAndEnd.Last().Price == 0 || startAndEnd.First().Price == 0)
+            {
+                if (spyPricesCache.History == null ||
+                    Math.Abs(TimeUtils.ParseDate(spyPricesCache.History.Prices?.Last().Key ?? "0") - TimeUtils.GetTime()) > 86400)
+                {
+                    spyPricesCache.History = await stockRepository.GetStockHistory("SPY");
+                }
+                if (spyPricesCache.History?.Prices == null || spyPricesCache.History.Prices.LongCount() == 0)
+                    return BadRequest();
+                var startPrice = .0;
+                minDelta = long.MaxValue;
+                spyPricesCache!.History.Prices.ToList().ForEach(x => {
+                    var delta = Math.Abs(TimeUtils.ParseDate(x.Key) - request.Date);
+                    if (delta < minDelta)
+                    {
+                        startPrice = double.Parse(x.Value.Close ?? "0");
+                        minDelta = delta;
+                    }
+                });
+                var endPrice = double.Parse(spyPricesCache.History.Prices?.Last().Value.Close ?? "0");
+                if (startPrice == 0 || endPrice == 0)
+                    return BadRequest();
+                if(endPrice <= startPrice)
+                    return BadRequest();
+                return request.Sum * (endPrice / startPrice);
+            }
+            if (startAndEnd.Last().Price <= startAndEnd.First().Price)
+                return BadRequest();
+            return request.Sum * (startAndEnd.Last().Price / startAndEnd.First().Price);
         }
     }
 }

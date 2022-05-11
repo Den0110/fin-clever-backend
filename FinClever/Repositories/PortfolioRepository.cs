@@ -31,11 +31,17 @@ namespace FinClever.Repositories
 
         public async Task<IEnumerable<string>> GetAllNotUpdatedTickets()
         {
-            return await context.InvestOperations
-                .GroupBy(o => o.Ticker)
-                .Select(x => x.Key)
-                .Where(x => context.HistoryStockPrices.OrderByDescending(x => x.Date).Last().Date - TimeUtils.GetTime() > 86400)
-                .ToListAsync();
+            var allTickets = await GetAllTickets();
+            return allTickets.ToList().Where(x => {
+                var prices = context.HistoryStockPrices.Where(h => h.Ticker == x)
+                    .OrderByDescending(x => x.Date);
+                var lastDate = 0L;
+                if(prices.Count() > 0)
+                {
+                    lastDate = prices.First().Date;
+                }
+                return Math.Abs(lastDate - TimeUtils.GetTime()) > 86400;
+            });
         }
 
         public async Task<IEnumerable<string>> GetNewTickets()

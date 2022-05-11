@@ -25,7 +25,7 @@ namespace FinClever
         {
             Console.WriteLine("History caching start");
             var allTickers = await portfolioRepository.GetAllNotUpdatedTickets();
-
+            Console.WriteLine($"Loading History for {allTickers.Count()} tickets");
             var counter = 0;
             foreach (var t in allTickers)
             {

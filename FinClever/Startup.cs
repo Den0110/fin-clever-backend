@@ -1,3 +1,4 @@
+using FinClever.Models.invest;
 using FinClever.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -40,6 +41,7 @@ namespace FinClever
             services.AddScoped<IPortfolioRepository, PortfolioRepository>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
             services.AddScoped<IStockRepository, StockRepository>();
+            services.AddSingleton<SpyPricesCache, SpyPricesCache>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddDbContext<FinCleverDbContext>(options =>
