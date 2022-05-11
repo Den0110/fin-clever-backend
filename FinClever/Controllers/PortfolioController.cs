@@ -75,15 +75,16 @@ namespace FinClever.Controllers
                 }
             });
 
-            var startAndEnd = await portfolioRepository.GetPortfolioHistory(
+            var startAndCurrent = await portfolioRepository.GetPortfolioHistory(
                 User.GetId(),
                 new[] { dateForPortfolio, ((DateTimeOffset)DateTime.Now).ToUnixTimeSeconds() },
                 true
             );
-            if (startAndEnd.Count() < 2 || startAndEnd.Last().Price == 0 || startAndEnd.First().Price == 0)
+            if (startAndCurrent.Count() < 2 || startAndCurrent.Last().Price == 0 || startAndCurrent.First().Price == 0)
             {
-                if (spyPricesCache.History == null ||
-                    Math.Abs(TimeUtils.ParseDate(spyPricesCache.History.Prices?.Last().Key ?? "0") - TimeUtils.GetTime()) > 86400)
+                if (spyPricesCache.History?.Prices == null ||
+                    spyPricesCache.History.Prices.LongCount() == 0 ||
+                    Math.Abs(TimeUtils.ParseDate(spyPricesCache.History.Prices?.First().Key ?? "1970-01-01") - TimeUtils.GetTime()) > 86400)
                 {
                     spyPricesCache.History = await stockRepository.GetStockHistory("SPY");
                 }
@@ -99,16 +100,16 @@ namespace FinClever.Controllers
                         minDelta = delta;
                     }
                 });
-                var endPrice = double.Parse(spyPricesCache.History.Prices?.Last().Value.Close ?? "0");
-                if (startPrice == 0 || endPrice == 0)
+                var currentPrice = double.Parse(spyPricesCache.History.Prices?.First().Value.Close ?? "0");
+                if (startPrice == 0 || currentPrice == 0)
                     return BadRequest();
-                if(endPrice <= startPrice)
+                if(currentPrice <= startPrice)
                     return BadRequest();
-                return request.Sum * (endPrice / startPrice);
+                return request.Sum * (currentPrice / startPrice);
             }
-            if (startAndEnd.Last().Price <= startAndEnd.First().Price)
+            if (startAndCurrent.Last().Price <= startAndCurrent.First().Price)
                 return BadRequest();
-            return request.Sum * (startAndEnd.Last().Price / startAndEnd.First().Price);
+            return request.Sum * (startAndCurrent.Last().Price / startAndCurrent.First().Price);
         }
     }
 }
